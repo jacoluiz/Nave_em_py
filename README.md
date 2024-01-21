@@ -9,11 +9,14 @@ Os pesos em um neurônio representam a força ou a importância associada a cada
 ## Camada
 Uma camada é um conjunto de neurônios que funcionam em paralelo. Em uma rede neural, geralmente temos três tipos principais de camadas:
 
-### Camada de Entrada: Recebe as entradas originais para o modelo. Cada neurônio na camada de entrada representa uma característica ou atributo dos dados.
+### Camada de Entrada:
+Recebe as entradas originais para o modelo. Cada neurônio na camada de entrada representa uma característica ou atributo dos dados.
 
-### Camadas Ocultas: Essas camadas são intermediárias entre a camada de entrada e a camada de saída. Cada neurônio nas camadas ocultas recebe entradas da camada anterior, realiza cálculos com pesos e produz uma saída. Essas camadas são chamadas "ocultas" porque suas saídas não são diretamente observáveis no contexto do problema.
+### Camadas Ocultas:
+Essas camadas são intermediárias entre a camada de entrada e a camada de saída. Cada neurônio nas camadas ocultas recebe entradas da camada anterior, realiza cálculos com pesos e produz uma saída. Essas camadas são chamadas "ocultas" porque suas saídas não são diretamente observáveis no contexto do problema.
 
-### Camada de Saída: Produz a saída final da rede neural. Cada neurônio na camada de saída representa uma classe ou uma previsão relacionada ao problema em questão.
+### Camada de Saída:
+Produz a saída final da rede neural. Cada neurônio na camada de saída representa uma classe ou uma previsão relacionada ao problema em questão.
 
 ## Função de Ativação
 Uma função de ativação é aplicada à soma ponderada das entradas e pesos de um neurônio, determinando se o neurônio deve ser ativado (produzir uma saída significativa) ou não. A função ReLU (Rectified Linear Unit) é uma escolha comum, pois é simples e eficaz.
