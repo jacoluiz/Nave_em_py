@@ -12,19 +12,39 @@ class Nave:
         self.tela = tela
 
         self.velocidade = 0
-        self.velocidade_max = 20
+        self.velocidade_max = 10
         self.aceleracao = 1
         self.angulo = 0
         self.sprit_nave = self.original_sprit_nave
+        self.erro = 0
 
         # Atributos relacionados ao boost
         self.boost_ativo = False
         self.tempo_boost_ativo = 0
-        self.tempo_proximo_boost = 0
+        self.tempo_proximo_boost = time.time()
         self.duracao_boost = 3  # em segundos
         self.intervalo_entre_boosts = 20  # em segundos
         self.ultima_ativacao = 0
         self.valor_preenchido_boost = 10
+
+    def calcular_distancia(self, ponto1, ponto2):
+        return math.sqrt((ponto1[0] - ponto2[0])**2 + (ponto1[1] - ponto2[1])**2)
+
+    def nave_se_aproximando(self, meteoro):
+        # Posição central da nave
+        posicao_nave = self.rect_nave.center
+        # Posição central do meteoro
+        posicao_meteoro = meteoro.rect_meteoro.center
+        # Distância atual entre a nave e o meteoro
+        distancia_atual = self.calcular_distancia(posicao_nave, posicao_meteoro)
+        # Distância entre a nave e o meteoro no quadro anterior
+        distancia_anterior = getattr(self, 'distancia_anterior', distancia_atual)
+        # Se a distância atual for menor que a distância anterior, a nave está se aproximando
+        if distancia_atual < distancia_anterior:
+            self.erro = round((distancia_anterior - distancia_atual) / LARGURA, 2)
+            print("A nave está se aproximando do meteoro: ", round((distancia_anterior - distancia_atual) / LARGURA, 2))
+        # Atualiza a distância anterior para a próxima verificação
+        self.distancia_anterior = distancia_atual
 
     def desenhar_barra_boost(self):
         # Desenhe o contorno da barra de progresso
@@ -56,24 +76,15 @@ class Nave:
 
     def colisoesBordas(self):
         # Lógica para verificar colisões com as bordas
-        if self.rect_nave.x <= 0:
-            self.rect_nave.x += 1
-            return True
+        if self.rect_nave.x < 0:
+            self.rect_nave.x = LARGURA - self.rect_nave.width
+        elif self.rect_nave.x > LARGURA - self.rect_nave.width:
+            self.rect_nave.x = 0
 
-        elif self.rect_nave.x >= LARGURA - self.rect_nave.width:
-            self.rect_nave.x -= 1
-            return True
-
-        elif self.rect_nave.y <= 0 :
-            self.rect_nave.y += 1
-            return True
-
-        elif self.rect_nave.y >= ALTURA - self.rect_nave.height:
-            self.rect_nave.y -= 1
-            return True
-
-        else:
-            return False
+        if self.rect_nave.y < 0:
+            self.rect_nave.y = ALTURA - self.rect_nave.height
+        elif self.rect_nave.y > ALTURA - self.rect_nave.height:
+            self.rect_nave.y = 0
 
     def diminuirVelocidade(self):
         if self.velocidade > 5 :
