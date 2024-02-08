@@ -24,10 +24,12 @@ Uma função de ativação é aplicada à soma ponderada das entradas e pesos de
 ## Treinamento da Rede Neural
 O treinamento de uma rede neural envolve apresentar um conjunto de dados de treinamento à rede, ajustar os pesos iterativamente para minimizar a diferença entre as saídas previstas e as saídas reais (rótulos) associadas a esses dados. Isso é feito usando algoritmos de otimização, como o Gradiente Descendente.
 
-## Viés
+## Viés (BIAS)
 O viés é um termo adicional adicionado à soma ponderada nas camadas de neurônios. Ele permite que o modelo aprenda a melhor representação dos dados, mesmo quando todas as entradas são zero.
 
 ## Estrutura da Rede Neural no Código
 O código implementa uma rede neural com uma camada de entrada, várias camadas ocultas e uma camada de saída. Os pesos dos neurônios são inicializados aleatoriamente, e a função ReLU é usada como função de ativação.
 
-Espero que essas explicações ajudem a compreender os conceitos básicos por trás do código. Se tiver mais dúvidas específicas ou se desejar uma explicação mais detalhada sobre algum ponto, sinta-se à vontade para perguntar!
+Espero que essas explicações ajudem a compreender os conceitos básicos por trás do código.
+
+PS: Não olhe o codigo, esta mais bagunçado que minha vida ;)

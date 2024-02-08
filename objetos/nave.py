@@ -1,59 +1,49 @@
 import pygame
 import math
 import time
+import random
 from utils.constantes import LARGURA, ALTURA
+from objetos.explosao import AnimacaoExplosao
+import os
 
-class Nave:
+caminho_pasta_sprites = "sprites/naves"
+# Lista para armazenar as referências dos sprites
+coletania_sprit_naves = []
+# Iterar sobre os arquivos na pasta de sprites
+for arquivo in os.listdir(caminho_pasta_sprites):
+    # Verificar se o arquivo é uma imagem
+    if arquivo.endswith(".png"):
+        # Carregar o sprite e adicionar à lista
+        sprite = pygame.image.load(os.path.join(caminho_pasta_sprites, arquivo))
+        coletania_sprit_naves.append(sprite)
+
+class Nave(pygame.sprite.Sprite):
     def __init__(self, tela):
-        self.original_sprit_nave = pygame.image.load("sprites/nave.png")
+        super().__init__()
+        self.original_sprit_nave = random.choice(coletania_sprit_naves)
         self.original_sprit_nave = pygame.transform.scale(self.original_sprit_nave, (32, 32))
         self.rect_nave = self.original_sprit_nave.get_rect()
         self.resetar_posicao()
         self.tela = tela
 
         self.velocidade = 0
-        self.velocidade_max = 10
+        self.velocidade_max = 5
         self.aceleracao = 1
         self.angulo = 0
         self.sprit_nave = self.original_sprit_nave
-        self.erro = 0
 
-        # Atributos relacionados ao boost
         self.boost_ativo = False
         self.tempo_boost_ativo = 0
         self.tempo_proximo_boost = time.time()
         self.duracao_boost = 3  # em segundos
-        self.intervalo_entre_boosts = 20  # em segundos
+        self.intervalo_entre_boosts = 10  # em segundos
         self.ultima_ativacao = 0
         self.valor_preenchido_boost = 10
-
-    def calcular_distancia(self, ponto1, ponto2):
-        return math.sqrt((ponto1[0] - ponto2[0])**2 + (ponto1[1] - ponto2[1])**2)
-
-    def nave_se_aproximando(self, meteoro):
-        # Posição central da nave
-        posicao_nave = self.rect_nave.center
-        # Posição central do meteoro
-        posicao_meteoro = meteoro.rect_meteoro.center
-        # Distância atual entre a nave e o meteoro
-        distancia_atual = self.calcular_distancia(posicao_nave, posicao_meteoro)
-        # Distância entre a nave e o meteoro no quadro anterior
-        distancia_anterior = getattr(self, 'distancia_anterior', distancia_atual)
-        # Se a distância atual for menor que a distância anterior, a nave está se aproximando
-        if distancia_atual < distancia_anterior:
-            self.erro = round((distancia_anterior - distancia_atual) / LARGURA, 2)
-            print("A nave está se aproximando do meteoro: ", round((distancia_anterior - distancia_atual) / LARGURA, 2))
-        # Atualiza a distância anterior para a próxima verificação
-        self.distancia_anterior = distancia_atual
+        self.explosao = AnimacaoExplosao()
 
     def desenhar_barra_boost(self):
-        # Desenhe o contorno da barra de progresso
         pygame.draw.rect(self.tela, (255, 255, 255), ((LARGURA - 35), (ALTURA - 120), 25, 100), 2, 5)
-        
-        # Calcule o percentual da variável em relação ao máximo
         percentual = (((time.time() + self.intervalo_entre_boosts) - self.tempo_proximo_boost) / self.intervalo_entre_boosts) * 100
-
-        # Calcule a largura proporcional com base no valor atual e máximo
         self.valor_preenchido_boost = int(percentual)
 
         cor_boost = "#00BF0F"
@@ -66,7 +56,6 @@ class Nave:
         elif self.valor_preenchido_boost >= 60 and self.valor_preenchido_boost <=99:
             cor_boost = "#771B8F"
 
-        # Desenhe a barra de progresso preenchido
         if self.valor_preenchido_boost > 1 :
             pygame.draw.rect(self.tela, cor_boost, ((LARGURA - 34), (ALTURA - 21), 23, -(self.valor_preenchido_boost - 2)), 0, 5)
 
@@ -74,8 +63,7 @@ class Nave:
         self.rect_nave.x = (LARGURA - self.rect_nave.width) // 2
         self.rect_nave.y = (ALTURA - self.rect_nave.height) // 2
 
-    def colisoesBordas(self):
-        # Lógica para verificar colisões com as bordas
+    def colisoes_bordas(self):
         if self.rect_nave.x < 0:
             self.rect_nave.x = LARGURA - self.rect_nave.width
         elif self.rect_nave.x > LARGURA - self.rect_nave.width:
@@ -86,27 +74,24 @@ class Nave:
         elif self.rect_nave.y > ALTURA - self.rect_nave.height:
             self.rect_nave.y = 0
 
-    def diminuirVelocidade(self):
+    def diminuir_velocidade(self):
         if self.velocidade > 5 :
-            self.velocidade -= 0.01
+            self.velocidade -= 0.02
         elif self.velocidade <= 5 and self.velocidade > 2:
             self.velocidade -= 0.008
         elif self.velocidade <= 2 and self.velocidade > 0:
-            self.velocidade -= 0.002
+            self.velocidade -= 0.001
 
     def ativar_boost(self):
-        # Verifica se o boost pode ser ativado
         tempo_atual = time.time()
         if tempo_atual > self.tempo_proximo_boost:
-            print("Boost ativo")
             self.ultima_ativacao = tempo_atual
             self.boost_ativo = True
             self.tempo_boost_ativo = tempo_atual + self.duracao_boost
             self.tempo_proximo_boost = tempo_atual + self.intervalo_entre_boosts
 
     def acelerar(self):
-        self.diminuirVelocidade()
-
+        self.diminuir_velocidade()
         aceleracao_x = -self.aceleracao * math.sin(math.radians(self.angulo))
         aceleracao_y = -self.aceleracao * math.cos(math.radians(self.angulo))
 
@@ -116,18 +101,25 @@ class Nave:
             elif self.boost_ativo and (time.time() - self.ultima_ativacao) >= 1 :
                 self.velocidade += 0.1
 
-        if not self.colisoesBordas():
+        if not self.colisoes_bordas():
             self.rect_nave.x += self.velocidade * aceleracao_x
             self.rect_nave.y += self.velocidade * aceleracao_y
 
     def rotacionar(self, angulo):
-        if self.velocidade >= 0.5 :
+        if self.velocidade >= 0.5:
             self.angulo += angulo
             self.sprit_nave = pygame.transform.rotate(self.original_sprit_nave, self.angulo)
             self.rect_nave = self.sprit_nave.get_rect(center=self.rect_nave.center)
 
     def desenha_nave(self):
         self.tela.blit(self.sprit_nave, self.rect_nave)
+
+    def bateu_no_meteoro(self, hitbox):
+        if self.rect_nave.colliderect(hitbox):
+            self.explosao.executar_animacao(self.tela, (self.rect_nave.x, self.rect_nave.y))
+            self.kill()
+            return True
+        return False
 
     def atualizar(self):
         self.acelerar()
