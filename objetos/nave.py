@@ -78,9 +78,9 @@ class Nave(pygame.sprite.Sprite):
         if self.velocidade > 5 :
             self.velocidade -= 0.02
         elif self.velocidade <= 5 and self.velocidade > 2:
-            self.velocidade -= 0.008
+            self.velocidade -= 0.01
         elif self.velocidade <= 2 and self.velocidade > 0:
-            self.velocidade -= 0.001
+            self.velocidade -= 0.005
 
     def ativar_boost(self):
         tempo_atual = time.time()
@@ -91,7 +91,7 @@ class Nave(pygame.sprite.Sprite):
             self.tempo_proximo_boost = tempo_atual + self.intervalo_entre_boosts
 
     def acelerar(self):
-        self.diminuir_velocidade()
+        self.diminuir_velocidade() if not  self.boost_ativo else None
         aceleracao_x = -self.aceleracao * math.sin(math.radians(self.angulo))
         aceleracao_y = -self.aceleracao * math.cos(math.radians(self.angulo))
 
@@ -101,9 +101,8 @@ class Nave(pygame.sprite.Sprite):
             elif self.boost_ativo and (time.time() - self.ultima_ativacao) >= 1 :
                 self.velocidade += 0.1
 
-        if not self.colisoes_bordas():
-            self.rect_nave.x += self.velocidade * aceleracao_x
-            self.rect_nave.y += self.velocidade * aceleracao_y
+        self.rect_nave.x += self.velocidade * aceleracao_x
+        self.rect_nave.y += self.velocidade * aceleracao_y
 
     def rotacionar(self, angulo):
         if self.velocidade >= 0.5:

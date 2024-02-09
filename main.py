@@ -22,11 +22,11 @@ fechar_jogo = True
 naves = pygame.sprite.Group()
 meteoros = pygame.sprite.Group()
 
-max_inimigos = 10
+max_inimigos = 0
 probabilidade_spaw = 0.01
 rede_neural_jogando = False
 #minimo 50
-numero_de_naves = 2
+numero_de_naves = 1
 contagem_geracao_atual = 0
 contagem_geracao_anterior = 0
 
